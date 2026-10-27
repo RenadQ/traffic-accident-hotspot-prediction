@@ -54,6 +54,10 @@ Raw data ──► Phase 3: Cleaning & Transformation ──► Phase 4: EDA ─
 1. **Decision Tree:** predicts accident severity (1–4).
 2. **Advanced Logistic Regression:** hotspot prediction with interpretable odds ratios.
 3. **Random Forest & Gradient Boosting:** accidents are grouped into **geographic grid cells**, and a cell is labeled a *hotspot* if it has more than one accident. Both models are tuned with `GridSearchCV`.
+4. **XGBoost (extra experiment):** the same grid-cell setup, with `scale_pos_weight` to pay more attention to the rare hotspot class.
+
+### 📈 Interactive dashboard
+A **Streamlit** dashboard to explore the data yourself: upload the Excel file, filter by year and weather, and browse histograms, box plots, time trends, weather vs severity, and a map of accident locations. You can also download an EDA audit report.
 
 ## 📊 Results
 
@@ -66,6 +70,16 @@ Final comparison on the test set for hotspot prediction (Hotspot = 1 is the posi
 | **Gradient Boosting (tuned)** ⭐ | **0.94** | **0.98** | **0.38** | **0.54** |
 
 On the grid-cell hotspot task, **tuned Gradient Boosting** was the strongest model. When it flags an area as a hotspot it is right **98%** of the time, and it finds 38% of all real hotspots, even though only ~8.9% of cells are hotspots. The Logistic Regression experiment used a separate engineered feature set; see [its results file](phase5_modeling/results/advanced_logistic_regression_results_final.txt).
+
+#### 🧪 Extra experiment: XGBoost
+After the final report, the grid-cell models were also run with **XGBoost**:
+
+| Model | Accuracy | Precision | Recall | F1 |
+|---|---|---|---|---|
+| XGBoost (baseline) | 0.94 | 0.72 | **0.60** | **0.65** |
+| XGBoost (tuned) | 0.93 | 0.70 | 0.48 | 0.57 |
+
+XGBoost finds many more of the real hotspots (**60%** vs 38%) and has the best F1 overall, but it is less precise (72% vs 98%). So the choice depends on the goal. Gradient Boosting is better when false alarms are costly, and XGBoost is better when missing a dangerous area is costly. Full output is in [`results/xgboost/`](phase5_modeling/results/xgboost/model_audit_report.txt). Exact numbers can shift slightly with different library versions.
 
 The Decision Tree severity classifier reached **76% accuracy** but struggled with rare severity levels (1 and 4). This is a direct effect of class imbalance.
 
@@ -115,14 +129,18 @@ The Decision Tree severity classifier reached **76% accuracy** but struggled wit
 │   ├── EDA_audit_report.txt
 │   └── figures/                      # 136 charts
 │
+├── dashboard/
+│   └── streamlit_dashboard.py        # Interactive data dashboard
+│
 └── phase5_modeling/
     ├── 01_decision_tree.ipynb
     ├── 01_decision_tree_colab.ipynb  # Google Colab version
     ├── 02_advanced_logistic_regression.ipynb
     ├── 03_hotspot_rf_gb.py           # Grid hotspots + Random Forest + Gradient Boosting
     ├── 04_model_comparison.py        # Final model comparison charts
-    ├── figures/
-    └── results/                      # Metrics, audit reports, full predictions
+    ├── 05_hotspot_xgboost.py         # Extra experiment: adds XGBoost to the hotspot models
+    ├── figures/                      # (xgboost/ holds the XGBoost run's charts)
+    └── results/                      # Metrics, audit reports, full predictions (+ xgboost/)
 ```
 
 > 📖 **New here?** Start with [`reports/06_final_report.pdf`](reports/06_final_report.pdf). It explains every step in detail.
@@ -142,13 +160,20 @@ cd data
 python ../phase3_data_preparation/02_transformation_and_splitting.py   # cleaning → train/test split
 python ../phase4_eda/02_eda_visualizations.py                         # all EDA charts
 python ../phase5_modeling/03_hotspot_rf_gb.py                         # hotspot models
+python ../phase5_modeling/05_hotspot_xgboost.py                       # + XGBoost
+```
+
+To open the interactive dashboard, run this from the project root, then upload `data/transformed_data_train_V88.xlsx` in the browser:
+
+```bash
+streamlit run dashboard/streamlit_dashboard.py
 ```
 
 The notebooks can be opened in Jupyter or Google Colab.
 
 ## 🛠️ Tech stack
 
-Python · pandas · NumPy · scikit-learn · matplotlib · seaborn · openpyxl · Jupyter / Google Colab
+Python · pandas · NumPy · scikit-learn · XGBoost · matplotlib · seaborn · Plotly · Streamlit · openpyxl · Jupyter / Google Colab
 
 ---
 
