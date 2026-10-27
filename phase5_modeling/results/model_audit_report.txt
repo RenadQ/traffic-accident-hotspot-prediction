@@ -1,0 +1,146 @@
+============================================================
+       MODELING AUDIT REPORT - (HOTSPOT PREDICTION)
+============================================================
+PROJECT GOAL: Predict High-Risk Traffic Accident Locations
+
+--- 1. Data Loading ---
+Loading data from: 'transformed_data_train_V88.xlsx'
+Original accident records loaded: 5045
+
+--- 2. Feature Engineering: Creating Grid Cells ---
+Grouping 5045 accidents into geographic grid cells...
+Created a new dataset of 4557 unique grid cells.
+
+--- 3. Creating Target Variable: 'Is_Hotspot' ---
+Hotspot Threshold: Cells with > 1.0 accidents are 'Hotspots'.
+Total Hotspot cells (1):   406
+Total Non-Hotspot cells (0): 4151
+
+--- 4. Final Model Preparation ---
+Training samples (grid cells): 3189
+Testing samples (grid cells): 1368
+
+
+==================================================
+ Task 3: Baseline Model Implementation (Predicting 'Is_Hotspot')
+==================================================
+
+
+--- Random Forest (Baseline) ---
+Accuracy: 0.9137
+Classification Report (0=Not_Hotspot, 1=Is_Hotspot):
+              precision    recall  f1-score   support
+
+           0       0.91      1.00      0.95      1246
+           1       0.75      0.05      0.09       122
+
+    accuracy                           0.91      1368
+   macro avg       0.83      0.52      0.52      1368
+weighted avg       0.90      0.91      0.88      1368
+
+
+
+--- Gradient Boosting (Baseline) ---
+Accuracy: 0.9313
+Classification Report (0=Not_Hotspot, 1=Is_Hotspot):
+              precision    recall  f1-score   support
+
+           0       0.93      1.00      0.96      1246
+           1       0.97      0.24      0.38       122
+
+    accuracy                           0.93      1368
+   macro avg       0.95      0.62      0.67      1368
+weighted avg       0.93      0.93      0.91      1368
+
+
+
+==================================================
+ Task 4: Hyperparameter Tuning & Validation
+==================================================
+
+
+Tuning Random Forest with GridSearchCV (cv=5)...
+Random Forest tuning complete.
+Best RF Parameters: {'max_depth': 20, 'n_estimators': 150}
+Best cross-validation accuracy: 0.9116
+
+
+Tuning Gradient Boosting with GridSearchCV (cv=5)...
+Gradient Boosting tuning complete.
+Best GB Parameters: {'learning_rate': 0.1, 'max_depth': 5, 'n_estimators': 150}
+Best cross-validation accuracy: 0.9436
+
+
+==================================================
+ 7. Final Tuned Model Performance & Predictions
+==================================================
+
+
+--- Random Forest (Tuned) ---
+Baseline Accuracy: 0.9137
+Tuned Accuracy:   0.9152
+Improvement:      +0.0015
+Tuned Classification Report (0=Not_Hotspot, 1=Is_Hotspot):
+              precision    recall  f1-score   support
+
+           0       0.92      1.00      0.96      1246
+           1       0.88      0.06      0.11       122
+
+    accuracy                           0.92      1368
+   macro avg       0.90      0.53      0.53      1368
+weighted avg       0.91      0.92      0.88      1368
+
+
+
+--- Gradient Boosting (Tuned) ---
+Baseline Accuracy: 0.9313
+Tuned Accuracy:   0.9437
+Improvement:      +0.0124
+Tuned Classification Report (0=Not_Hotspot, 1=Is_Hotspot):
+              precision    recall  f1-score   support
+
+           0       0.94      1.00      0.97      1246
+           1       0.98      0.38      0.54       122
+
+    accuracy                           0.94      1368
+   macro avg       0.96      0.69      0.76      1368
+weighted avg       0.95      0.94      0.93      1368
+
+
+
+==================================================
+ 8. Sample Predictions & Saving Full Report
+==================================================
+
+Showing first 10 predictions from the test set of grid cells:
+      Lat_Grid  Lng_Grid  Actual_Is_Hotspot  Predicted_Is_Hotspot
+3946     41.74    -87.95                  0                     0
+3172     38.93    -94.66                  0                     0
+3167     38.92    -77.01                  0                     0
+1226     33.40   -111.97                  0                     0
+643      29.93    -90.07                  0                     0
+3634     40.67    -73.80                  0                     0
+1229     33.41   -112.20                  0                     0
+965      32.42    -80.66                  0                     0
+4        25.58    -80.33                  0                     0
+4045     42.13    -79.16                  0                     0
+
+Successfully saved ALL 1368 predictions to a separate file: 'full_predictions_report.xlsx'
+
+
+==================================================
+ 9. Generating Visualizations
+==================================================
+Generating Predicted Hotspot Map...
+Saved 'predicted_hotspot_map.png'
+Generating Feature Importance Plot for 'Tuned Random Forest'...
+Saved 'feature_importance.png'
+Generating Confusion Matrix for 'Tuned Random Forest'...
+Saved 'confusion_matrix.png'
+
+
+==================================================
+ 10. Writing Smart Audit File
+==================================================
+
+Total execution time: 57.96 seconds.
